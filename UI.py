@@ -106,6 +106,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
         a = self.production_inputGrid.get_value()[:, 0]
         b = self.consumption_inputGrid.get_value()[0]
         self.error_label.hide()
+        self.outputGrid.show()
         if np.sum(np.sum(a) == np.sum(b)):
             d, is_base = nwa(c, a, b)
             d, is_base, p = traffic(c, d, is_base)
@@ -114,6 +115,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
             d = np.round(d, 5)
             self.outputGrid.set_value(d)
         else:
+            self.outputGrid.hide()
             self.error_label.show()
         
 
