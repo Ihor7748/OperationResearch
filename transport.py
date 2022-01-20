@@ -91,7 +91,16 @@ def false_var_place_search(is_base):
     # find reachable bases
     reachable = find_reach([(x[0], y[0])], x[0], y[0], is_base)
     non_reach = [i for i in bases if i not in reachable]
-    return 0, non_reach[0][0]
+    if non_reach:
+        return 0, non_reach[0][1]
+    else:
+        for i in range(is_base.shape[0]):
+            if not is_base[i].any():
+                return i, 0
+        for j in range(is_base.shape[1]):
+            if not is_base[:, j].any():
+                return 0, j
+        
 
 
 def cycle_intersect(cycles, measures):
