@@ -2,11 +2,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QGridLayout
 import sys
 import numpy as np
+import re
 from transport import traffic, nwa
 
 
 WIDTH = 1200
-HEIGHT = 675
+HEIGHT = 900
 
 
 class LabelGrid(QtWidgets.QWidget):
@@ -47,21 +48,20 @@ class InputGrid(QtWidgets.QWidget):
                 self.entries[i].append(entry)
                 self.layout.addWidget(entry, i, j)
 
+
     def get_value(self):
         res = []
         for i in range(self.size_y):
             res.append([])
             for j in range(self.size_x):
                 tmp = self.entries[i][j].text()
-                if tmp:
+                if tmp and re.search(tmp, r'\d*\.\d*'):
                     res[i].append(float(tmp))
                 else:
                     res[i].append(0.0)
         return np.array(res)
 
 
-
-                
 
 
 
@@ -81,7 +81,15 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.production_inputGrid.setGeometry(QtCore.QRect(650, 10, 135, 300))
         self.consumption_inputGrid.setGeometry(QtCore.QRect(10, 350, 600, 100))
         self.outputGrid.setGeometry(QtCore.QRect(25, 450, 600, 300))
-       
+        self.invalid_input_label = QLabel(self.centralwidget)
+        self.invalid_input_label.setGeometry(QtCore.QRect(10, 450, 500, 50))
+        self.invalid_input_label.setText('Invalid_input')
+        self.invalid_input_label.hide()
+        self.error_label = QLabel(self.centralwidget)
+        self.error_label.setText('Error: sum of production should\n'
+                                    +'be equal to sum of consumtion')
+        self.error_label.hide()
+        self.error_label.setGeometry(QtCore.QRect(30, 500, 500, 100))
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -97,13 +105,16 @@ class Ui_MainWindow(QtWidgets.QWidget):
         c = self.cost_inputGrid.get_value()
         a = self.production_inputGrid.get_value()[:, 0]
         b = self.consumption_inputGrid.get_value()[0]
-        if np.sum(a) == np.sum(b):
+        self.error_label.hide()
+        if np.sum(np.sum(a) == np.sum(b)):
             d, is_base = nwa(c, a, b)
             d, is_base, p = traffic(c, d, is_base)
             while p.any():
                 d, is_base, p = traffic(c, d, is_base)
             d = np.round(d, 5)
             self.outputGrid.set_value(d)
+        else:
+            self.error_label.show()
         
 
 
