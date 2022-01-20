@@ -97,12 +97,13 @@ class Ui_MainWindow(QtWidgets.QWidget):
         c = self.cost_inputGrid.get_value()
         a = self.production_inputGrid.get_value()[:, 0]
         b = self.consumption_inputGrid.get_value()[0]
-        d, is_base = nwa(c, a, b)
-        d, is_base, p = traffic(c, d, is_base)
-        while p.any():
+        if np.sum(a) == np.sum(b):
+            d, is_base = nwa(c, a, b)
             d, is_base, p = traffic(c, d, is_base)
-        d = np.round(d, 5)
-        self.outputGrid.set_value(d)
+            while p.any():
+                d, is_base, p = traffic(c, d, is_base)
+            d = np.round(d, 5)
+            self.outputGrid.set_value(d)
         
 
 
