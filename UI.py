@@ -55,7 +55,7 @@ class InputGrid(QtWidgets.QWidget):
             res.append([])
             for j in range(self.size_x):
                 tmp = self.entries[i][j].text()
-                if tmp and re.search(tmp, r'\d*\.\d*'):
+                if tmp and re.match(r'\d+\.*\d*', tmp):
                     res[i].append(float(tmp))
                 else:
                     res[i].append(0.0)
