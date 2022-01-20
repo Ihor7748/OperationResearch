@@ -90,6 +90,9 @@ class Ui_MainWindow(QtWidgets.QWidget):
                                     +'be equal to sum of consumtion')
         self.error_label.hide()
         self.error_label.setGeometry(QtCore.QRect(30, 500, 500, 100))
+        self.price_label = QLabel(self.centralwidget)
+        self.price_label.setGeometry(QtCore.QRect(25, 730, 500, 100))
+        self.price_label.hide()
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.retranslateUi(MainWindow)
@@ -106,15 +109,19 @@ class Ui_MainWindow(QtWidgets.QWidget):
         a = self.production_inputGrid.get_value()[:, 0]
         b = self.consumption_inputGrid.get_value()[0]
         self.error_label.hide()
-        self.outputGrid.show()
         if np.sum(np.sum(a) == np.sum(b)):
+            self.outputGrid.show()
+            self.price_label.show()
             d, is_base = nwa(c, a, b)
             d, is_base, p = traffic(c, d, is_base)
             while p.any():
                 d, is_base, p = traffic(c, d, is_base)
             d = np.round(d, 5)
             self.outputGrid.set_value(d)
+            self.price_label.setText('Ціна транспортування: ' + str(np.sum(d*c)))
+            self.price_label.show()
         else:
+            self.price_label.hide()
             self.outputGrid.hide()
             self.error_label.show()
         
